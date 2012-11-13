@@ -1,6 +1,7 @@
 /*
- *  ofxOpticalFlow.cpp
- *  Created by lukasz karluk on 31/07/10.
+ *  ofxOpticalFlowFarneback.cpp
+ *  created by Timothy Scaffidi on 13/11/2012
+ *  based on ofxOpticalFlowLK by lukasz karluk.
  *
  */
 
