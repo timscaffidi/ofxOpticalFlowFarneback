@@ -3,25 +3,38 @@
 //--------------------------------------------------------------
 void testApp::setup(){
     
-    vidGrabber.initGrabber(640, 480);
-    flowSolver.setup(vidGrabber.getWidth()/2, vidGrabber.getHeight()/2, 0.5, 3, 10, 1, 7, 1.5, false, false);
+    vidPlayer.loadMovie("Godard.mov");
+    vidPlayer.play();
+    flowSolver.setup(vidPlayer.getWidth(), vidPlayer.getHeight(), 0.5, 3, 10, 1, 7, 1.5, false, false);
+    flowSolver2.setup(vidPlayer.getWidth(), vidPlayer.getHeight());
+    
     ofEnableAlphaBlending();
+    ofSetBackgroundAuto(true);
+    ofBackground(0);
+    
+
 }
 
 //--------------------------------------------------------------
 void testApp::update(){
-    vidGrabber.update();
-    if(vidGrabber.isFrameNew()){
-        flowSolver.update(vidGrabber);
+    vidPlayer.update();
+    if(vidPlayer.isFrameNew()){
+        flowSolver.update(vidPlayer);
+        //flowSolver2.update(vidPlayer);
     }
 }
 
 //--------------------------------------------------------------
 void testApp::draw(){
     
+    ofSetColor(0);
+    ofFill();
+    ofRectangle(0,0,ofGetWidth(),ofGetHeight());
+    
     ofSetColor(255, 255, 255);
-    vidGrabber.draw(0, 0);
-    flowSolver.drawColored(vidGrabber.getWidth(), vidGrabber.getHeight(), 10, 3);
+    vidPlayer.draw(0, 0,vidPlayer.getWidth()*2, vidPlayer.getHeight()*2);
+    flowSolver.drawColored(vidPlayer.getWidth()*2, vidPlayer.getHeight()*2, 10, 3);
+    //flowSolver2.drawColored(vidPlayer.getWidth()*2, vidPlayer.getHeight()*2, 10, 3);
     
     stringstream m;
     m << "fps " << ofGetFrameRate() << endl

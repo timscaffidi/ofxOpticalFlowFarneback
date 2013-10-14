@@ -1,13 +1,13 @@
 /*
  *  ofxOpticalFlowFarneback.cpp
  *  created by Timothy Scaffidi on 13/11/2012
- *  based on ofxOpticalFlowLK by lukasz karluk.
+ *  based on ofxOpticalFlowFarneback by lukasz karluk.
  *
  */
 
 #include "ofxOpticalFlowFarneback.h"
 
-ofxOpticalFlowLK::ofxOpticalFlowLK() {
+ofxOpticalFlowFarneback::ofxOpticalFlowFarneback() {
     
     flow = NULL;
     
@@ -17,7 +17,7 @@ ofxOpticalFlowLK::ofxOpticalFlowLK() {
     bInitialised = false;
 }
 
-ofxOpticalFlowLK::~ofxOpticalFlowLK() {
+ofxOpticalFlowFarneback::~ofxOpticalFlowFarneback() {
 	destroy();
 }
 
@@ -25,15 +25,15 @@ ofxOpticalFlowLK::~ofxOpticalFlowLK() {
 //	SETUP.
 ///////////////////////////////////////////
 
-void ofxOpticalFlowLK::setup(const ofRectangle& size) {
+void ofxOpticalFlowFarneback::setup(const ofRectangle& size) {
 	setup(size.width, size.height);
 }
 
-void ofxOpticalFlowLK::setup(int width, int height){
+void ofxOpticalFlowFarneback::setup(int width, int height){
     setup(width, height, 0.5, 3, 10, 1, 7, 1.5, false, false);
 }
 
-void ofxOpticalFlowLK::setup(int width, int height,
+void ofxOpticalFlowFarneback::setup(int width, int height,
                              double pyramidScale,
                              int pyramidLevels,
                              int windowSize,
@@ -74,7 +74,7 @@ void ofxOpticalFlowLK::setup(int width, int height,
 	bInitialised = true;
 }
 
-void ofxOpticalFlowLK::reset() {
+void ofxOpticalFlowFarneback::reset() {
 	colrImgLrg.set(0);
 	colrImgSml.set(0);
 	greyImgLrg.set(0);
@@ -84,7 +84,7 @@ void ofxOpticalFlowLK::reset() {
     cvSetZero(flow);
 }
 
-void ofxOpticalFlowLK::destroy() {
+void ofxOpticalFlowFarneback::destroy() {
 	colrImgLrg.clear();
 	colrImgSml.clear();
 	greyImgLrg.clear();
@@ -100,27 +100,27 @@ void ofxOpticalFlowLK::destroy() {
 //	UPDATE.
 ///////////////////////////////////////////
 
-void ofxOpticalFlowLK::update(ofImage& source) {
+void ofxOpticalFlowFarneback::update(ofImage& source) {
 	update(source.getPixels(), source.width, source.height, source.type);
 }
 
-void ofxOpticalFlowLK::update(ofxCvColorImage& source) {
+void ofxOpticalFlowFarneback::update(ofxCvColorImage& source) {
 	update(source.getPixels(), source.width, source.height, OF_IMAGE_COLOR);
 }
 
-void ofxOpticalFlowLK::update(ofxCvGrayscaleImage& source) {
+void ofxOpticalFlowFarneback::update(ofxCvGrayscaleImage& source) {
 	update(source.getPixels(), source.width, source.height, OF_IMAGE_GRAYSCALE);
 }
 
-void ofxOpticalFlowLK::update(ofVideoPlayer& source) {
+void ofxOpticalFlowFarneback::update(ofVideoPlayer& source) {
 	update(source.getPixels(), source.width, source.height, OF_IMAGE_COLOR);	// assume colour image type.
 }
 
-void ofxOpticalFlowLK::update(ofVideoGrabber& source) {
+void ofxOpticalFlowFarneback::update(ofVideoGrabber& source) {
 	update(source.getPixels(), source.width, source.height, OF_IMAGE_COLOR);	// assume colour image type.
 }
 
-void ofxOpticalFlowLK::update(unsigned char* pixels, int width, int height, int imageType) {
+void ofxOpticalFlowFarneback::update(unsigned char* pixels, int width, int height, int imageType) {
 
 	bool rightSize = (sizeSml.width == width && sizeSml.height == height);
 	
@@ -174,7 +174,7 @@ void ofxOpticalFlowLK::update(unsigned char* pixels, int width, int height, int 
 	greyImgPrv = greyImgSml;
 }
 
-void ofxOpticalFlowLK::update(IplImage * previousImage, IplImage * currentImage) {
+void ofxOpticalFlowFarneback::update(IplImage * previousImage, IplImage * currentImage) {
     
     if((previousImage->width != currentImage->width) || (previousImage->height != currentImage->height)) {
         return; // images do not match.
@@ -203,13 +203,13 @@ void ofxOpticalFlowLK::update(IplImage * previousImage, IplImage * currentImage)
 //	OP.FLOW VELOCITY GETTERS.
 ///////////////////////////////////////////
 
-ofPoint ofxOpticalFlowLK::getVelAtNorm(float x, float y) {
+ofPoint ofxOpticalFlowFarneback::getVelAtNorm(float x, float y) {
 	int px = x * (flow->width - 1);
 	int py = y * (flow->height - 1);
     return getVelAtPixel(px, py);
 }
 
-ofPoint ofxOpticalFlowLK::getVelAtPixel(int x, int y) {
+ofPoint ofxOpticalFlowFarneback::getVelAtPixel(int x, int y) {
 	x = ofClamp(x, 0, flow->width - 1);
 	y = ofClamp(y, 0, flow->height - 1);
 	
@@ -225,7 +225,7 @@ ofPoint ofxOpticalFlowLK::getVelAtPixel(int x, int y) {
 //	DRAW.
 ///////////////////////////////////////////
 
-void ofxOpticalFlowLK::draw(int width, int height,  float lineScale, int res) {
+void ofxOpticalFlowFarneback::draw(int width, int height,  float lineScale, int res) {
 	bool rightSize = (sizeSml.width == width && sizeSml.height == height);
 	
 	ofPoint vel;
@@ -247,7 +247,7 @@ void ofxOpticalFlowLK::draw(int width, int height,  float lineScale, int res) {
 	}
 }
 
-void ofxOpticalFlowLK::drawColored(int width, int height,  float lineScale, int res) {
+void ofxOpticalFlowFarneback::drawColored(int width, int height,  float lineScale, int res) {
 	bool rightSize = (sizeSml.width == width && sizeSml.height == height);
 	
 	ofPoint vel;
@@ -273,7 +273,6 @@ void ofxOpticalFlowLK::drawColored(int width, int height,  float lineScale, int 
             ofFloatColor c;
             c.setHsb(hue, 1.0, 1.0);
             c.a = 0.25;
-            
             velMesh.addColor(c);
             velMesh.addVertex(p);
             c.a = 0.0;
@@ -291,7 +290,7 @@ void ofxOpticalFlowLK::drawColored(int width, int height,  float lineScale, int 
 //	CONFIG.
 ///////////////////////////////////////////
 
-void ofxOpticalFlowLK::setMirror(bool mirrorHorizontally, bool mirrorVertically) {
+void ofxOpticalFlowFarneback::setMirror(bool mirrorHorizontally, bool mirrorVertically) {
 	bMirrorH = mirrorHorizontally;
 	bMirrorV = mirrorVertically;
 }

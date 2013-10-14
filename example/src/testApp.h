@@ -2,6 +2,7 @@
 
 #include "ofMain.h"
 #include "ofxOpticalFlowFarneback.h"
+#include "ofxOpticalFlowLK.h"
 
 class testApp : public ofBaseApp{
 
@@ -21,6 +22,7 @@ class testApp : public ofBaseApp{
 		void gotMessage(ofMessage msg);
 		
     
-    ofVideoGrabber vidGrabber;
-    ofxOpticalFlowLK flowSolver;
+    ofVideoPlayer vidPlayer;
+    ofxOpticalFlowFarneback flowSolver;
+    ofxOpticalFlowLK flowSolver2;
 };
