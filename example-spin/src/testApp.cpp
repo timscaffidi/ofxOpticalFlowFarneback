@@ -2,6 +2,8 @@
 
 //--------------------------------------------------------------
 void testApp::setup(){
+    ofEnableDepthTest();
+
     vidGrabber.initGrabber(320, 240);
     flowSolver.setup(vidGrabber.getWidth(), vidGrabber.getHeight(), 0.5, 3, 10, 1, 7, 1.5, false, false);
     ofEnableAlphaBlending();
