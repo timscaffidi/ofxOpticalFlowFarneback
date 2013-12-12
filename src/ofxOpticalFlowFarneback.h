@@ -1,7 +1,7 @@
 /*
  *  ofxOpticalFlowFarneback.h
  *  created by Timothy Scaffidi on 13/11/2012
- *  based on ofxOpticalFlowLK by lukasz karluk.
+ *  based on ofxOpticalFlowFarneback by lukasz karluk.
  *
  */
 
@@ -13,12 +13,12 @@
 #include "ofMain.h"
 #include "ofxOpenCv.h"
 
-class ofxOpticalFlowLK {
+class ofxOpticalFlowFarneback {
 	
 public:
 	
-	 ofxOpticalFlowLK();
-	~ofxOpticalFlowLK();
+	 ofxOpticalFlowFarneback();
+	~ofxOpticalFlowFarneback();
 	
 	void setup(const ofRectangle& size);
 	void setup(int width, int height);
