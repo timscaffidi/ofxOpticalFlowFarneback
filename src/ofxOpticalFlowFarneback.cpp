@@ -8,13 +8,10 @@
 #include "ofxOpticalFlowFarneback.h"
 
 ofxOpticalFlowFarneback::ofxOpticalFlowFarneback() {
-    
-    flow = NULL;
-    
-    bMirrorH = false;
-    bMirrorV = false;
-    
-    bInitialised = false;
+	flow = NULL;
+	bMirrorH = false;
+	bMirrorV = false;
+	bInitialised = false;
 }
 
 ofxOpticalFlowFarneback::~ofxOpticalFlowFarneback() {
@@ -22,55 +19,55 @@ ofxOpticalFlowFarneback::~ofxOpticalFlowFarneback() {
 }
 
 ///////////////////////////////////////////
-//	SETUP.
+//                SETUP                  //
 ///////////////////////////////////////////
 
 void ofxOpticalFlowFarneback::setup(const ofRectangle& size) {
 	setup(size.width, size.height);
 }
 
-void ofxOpticalFlowFarneback::setup(int width, int height){
-    setup(width, height, 0.5, 3, 10, 1, 7, 1.5, false, false);
+void ofxOpticalFlowFarneback::setup(int width, int height) {
+	setup(width, height, 0.5, 3, 10, 1, 7, 1.5, false, false);
 }
 
 void ofxOpticalFlowFarneback::setup(int width, int height,
-                             double pyramidScale,
-                             int pyramidLevels,
-                             int windowSize,
-                             int iterationsPerLevel,
-                             int expansionArea,
-                             double expansionSigma,
-                             bool flowFeedback,
-                             bool gaussianFiltering) {
+									double pyramidScale,
+									int pyramidLevels,
+									int windowSize,
+									int iterationsPerLevel,
+									int expansionArea,
+									double expansionSigma,
+									bool flowFeedback,
+									bool gaussianFiltering) {
 	sizeSml.width = width;
 	sizeSml.height = height;
-	
+
 	sizeLrg.width = width;		// assume input size is the same as optical flow size.
 	sizeLrg.height = height;
-	
+
 	if(bInitialised) {
 		destroy();
-    }
-	
+	}
+
 	colrImgLrg.allocate(sizeLrg.width, sizeLrg.height);
 	colrImgSml.allocate(sizeSml.width, sizeSml.height);
 	greyImgLrg.allocate(sizeLrg.width, sizeLrg.height);
 	greyImgSml.allocate(sizeSml.width, sizeSml.height);
 	greyImgPrv.allocate(sizeSml.width, sizeSml.height);
-    
-    flow = cvCreateMat(sizeSml.height, sizeSml.width, CV_32FC2);
-	
-    pyr_scale = pyramidScale;
-    levels = pyramidLevels;
-    winsize = windowSize;
-    iterations = iterationsPerLevel;
-    poly_n = expansionArea;
-    poly_sigma = expansionSigma;
-    this->flowFeedback = flowFeedback;
-    this->gaussianFiltering = gaussianFiltering;
-    
+
+	flow = cvCreateMat(sizeSml.height, sizeSml.width, CV_32FC2);
+
+	pyr_scale = pyramidScale;
+	levels = pyramidLevels;
+	winsize = windowSize;
+	iterations = iterationsPerLevel;
+	poly_n = expansionArea;
+	poly_sigma = expansionSigma;
+	this->flowFeedback = flowFeedback;
+	this->gaussianFiltering = gaussianFiltering;
+
 	reset();
-	
+
 	bInitialised = true;
 }
 
@@ -80,8 +77,7 @@ void ofxOpticalFlowFarneback::reset() {
 	greyImgLrg.set(0);
 	greyImgSml.set(0);
 	greyImgPrv.set(0);
-
-    cvSetZero(flow);
+	cvSetZero(flow);
 }
 
 void ofxOpticalFlowFarneback::destroy() {
@@ -90,14 +86,14 @@ void ofxOpticalFlowFarneback::destroy() {
 	greyImgLrg.clear();
 	greyImgSml.clear();
 	greyImgPrv.clear();
-	
-    if(flow) {
-        cvReleaseMat(&flow);
-    }
+
+	if(flow) {
+		cvReleaseMat(&flow);
+	}
 }
 
 ///////////////////////////////////////////
-//	UPDATE.
+//                UPDATE                 //
 ///////////////////////////////////////////
 
 void ofxOpticalFlowFarneback::update(ofImage& source) {
@@ -113,135 +109,136 @@ void ofxOpticalFlowFarneback::update(ofxCvGrayscaleImage& source) {
 }
 
 void ofxOpticalFlowFarneback::update(ofVideoPlayer& source) {
-	update(source.getPixels(), source.width, source.height, OF_IMAGE_COLOR);	// assume colour image type.
+	update(source.getPixels(), source.width, source.height, OF_IMAGE_COLOR); // assume colour image type.
 }
 
 void ofxOpticalFlowFarneback::update(ofVideoGrabber& source) {
-	update(source.getPixels(), source.width, source.height, OF_IMAGE_COLOR);	// assume colour image type.
+	update(source.getPixels(), source.width, source.height, OF_IMAGE_COLOR); // assume colour image type.
 }
 
 void ofxOpticalFlowFarneback::update(unsigned char* pixels, int width, int height, int imageType) {
 
 	bool rightSize = (sizeSml.width == width && sizeSml.height == height);
-	
+
 	//-- making the input the right size for optical flow to work with.
-	
 	if(rightSize) {
 		if(imageType == OF_IMAGE_COLOR) {
 			colrImgSml.setFromPixels(pixels, sizeSml.width, sizeSml.height);
 			greyImgSml.setFromColorImage(colrImgSml);
-		} else if(imageType == OF_IMAGE_GRAYSCALE) {
+		}
+		else if(imageType == OF_IMAGE_GRAYSCALE) {
 			greyImgSml.setFromPixels(pixels, sizeSml.width, sizeSml.height);
-		} else {
+		}
+		else {
 			return;		// wrong image type.
 		}
-	} else {
+	}
+	else {
 
 		bool sizeLrgChanged = (sizeLrg.width != width || sizeLrg.height != height);
-		
 		if(sizeLrgChanged) {		// size of input has changed since last update.
 			sizeLrg.width = width;
 			sizeLrg.height = height;
-			
+
 			colrImgLrg.clear();
 			greyImgLrg.clear();
-			
+
 			colrImgLrg.allocate(sizeLrg.width, sizeLrg.height);
 			greyImgLrg.allocate(sizeLrg.width, sizeLrg.height);
-			
+
 			colrImgLrg.set(0);
 			greyImgLrg.set(0);
 		}
-		
+
 		if(imageType == OF_IMAGE_COLOR) {
 			colrImgLrg.setFromPixels(pixels, sizeLrg.width, sizeLrg.height);
 			colrImgSml.scaleIntoMe(colrImgLrg);
 			greyImgSml.setFromColorImage(colrImgSml);
-		} else if(imageType == OF_IMAGE_GRAYSCALE) {
+		}
+		else if(imageType == OF_IMAGE_GRAYSCALE) {
 			greyImgLrg.setFromPixels(pixels, sizeLrg.width, sizeLrg.height);
 			greyImgSml.scaleIntoMe(greyImgLrg);
-		} else {
+		}
+		else {
 			return;		// wrong image type.
 		}
 	}
-	
+
 	if(bMirrorH || bMirrorV) {
 		greyImgSml.mirror(bMirrorV, bMirrorH);
-    }
-	
-    update(greyImgPrv.getCvImage(), greyImgSml.getCvImage());
-	
+	}
+
+	update(greyImgPrv.getCvImage(), greyImgSml.getCvImage());
 	greyImgPrv = greyImgSml;
 }
 
 void ofxOpticalFlowFarneback::update(IplImage * previousImage, IplImage * currentImage) {
-    
-    if((previousImage->width != currentImage->width) || (previousImage->height != currentImage->height)) {
-        return; // images do not match.
-    }
-    
-    int w = currentImage->width;
-    int h = currentImage->height;
+	if((previousImage->width != currentImage->width) || (previousImage->height != currentImage->height)) {
+		return; // images do not match.
+	}
 
-    if(flow) {
-        if((flow->width != w) || (flow->height != h)) {
-            cvReleaseMat(&flow);
-            flow = cvCreateMat(h, w, CV_32FC2);
-        }
-    } else {
-        flow = cvCreateMat(h, w, CV_32FC2);
-    }
-    
-    int flags = 0;
-    if(flowFeedback) flags |= cv::OPTFLOW_USE_INITIAL_FLOW;
-    if(gaussianFiltering) flags |= cv::OPTFLOW_FARNEBACK_GAUSSIAN;
-    
-    cvCalcOpticalFlowFarneback(previousImage, currentImage, flow, pyr_scale, levels, winsize, iterations, poly_n, poly_sigma, flags);
+	int w = currentImage->width;
+	int h = currentImage->height;
+
+	if(flow) {
+		if((flow->width != w) || (flow->height != h)) {
+			cvReleaseMat(&flow);
+			flow = cvCreateMat(h, w, CV_32FC2);
+		}
+	}
+	else {
+		flow = cvCreateMat(h, w, CV_32FC2);
+	}
+
+	int flags = 0;
+	if(flowFeedback) flags |= cv::OPTFLOW_USE_INITIAL_FLOW;
+	if(gaussianFiltering) flags |= cv::OPTFLOW_FARNEBACK_GAUSSIAN;
+
+	cvCalcOpticalFlowFarneback(previousImage, currentImage, flow, pyr_scale, levels, winsize, iterations, poly_n, poly_sigma, flags);
 }
 
 ///////////////////////////////////////////
-//	OP.FLOW VELOCITY GETTERS.
+//       OP.FLOW VELOCITY GETTERS        //
 ///////////////////////////////////////////
 
 ofPoint ofxOpticalFlowFarneback::getVelAtNorm(float x, float y) {
 	int px = x * (flow->width - 1);
 	int py = y * (flow->height - 1);
-    return getVelAtPixel(px, py);
+	return getVelAtPixel(px, py);
 }
 
 ofPoint ofxOpticalFlowFarneback::getVelAtPixel(int x, int y) {
 	x = ofClamp(x, 0, flow->width - 1);
 	y = ofClamp(y, 0, flow->height - 1);
-	
+
 	ofPoint p;
-    CvPoint2D32f fxy = CV_MAT_ELEM(*flow, CvPoint2D32f, y, x);
-    p.x = fxy.x;
-    p.y = fxy.y;
+	CvPoint2D32f fxy = CV_MAT_ELEM(*flow, CvPoint2D32f, y, x);
+	p.x = fxy.x;
+	p.y = fxy.y;
 
 	return p;
 }
 
 ///////////////////////////////////////////
-//	DRAW.
+//                 DRAW                  //
 ///////////////////////////////////////////
 
 void ofxOpticalFlowFarneback::draw(int width, int height,  float lineScale, int res) {
 	bool rightSize = (sizeSml.width == width && sizeSml.height == height);
-	
+
 	ofPoint vel;
-	
 	for(int x=0; x<width; x+=res) {
 		for(int y=0; y<height; y+=res) {
 			if(rightSize) {
 				vel = getVelAtPixel(x, y);
-            } else {
+			}
+			else {
 				vel = getVelAtNorm(x / (float)width, y / (float)height);
-            }
-			
+			}
 			if(vel.length() < 1) {  // smaller then 1 pixel, no point drawing.
 				continue;
-            }
-			
+			}
+
 			ofLine(x, y, x + vel.x * lineScale, y + vel.y * lineScale);
 		}
 	}
@@ -249,45 +246,47 @@ void ofxOpticalFlowFarneback::draw(int width, int height,  float lineScale, int 
 
 void ofxOpticalFlowFarneback::drawColored(int width, int height,  float lineScale, int res) {
 	bool rightSize = (sizeSml.width == width && sizeSml.height == height);
-	
+
 	ofPoint vel;
-    ofMesh velMesh;
-    
-    velMesh.setMode(OF_PRIMITIVE_LINES);
-	
+	ofMesh velMesh;
+
+	velMesh.setMode(OF_PRIMITIVE_LINES);
+
 	for(int x=0; x<width; x+=res) {
 		for(int y=0; y<height; y+=res) {
 			if(rightSize) {
 				vel = getVelAtPixel(x, y);
-            } else {
+			}
+			else {
 				vel = getVelAtNorm(x / (float)width, y / (float)height);
-            }
-			
+			}
+
 			if(vel.length() < 1) {  // smaller then 1 pixel, no point drawing.
 				continue;
-            }
+			}
 			ofVec3f p(x,y);
-            ofVec3f vc = vel;
-            vc.normalize();
-            float hue = (atan2(vc.y, vc.x)+3.14159265)/(3.14159265*2.0);
-            ofFloatColor c;
-            c.setHsb(hue, 1.0, 1.0);
-            c.a = 0.25;
-            velMesh.addColor(c);
-            velMesh.addVertex(p);
-            c.a = 0.0;
-            velMesh.addColor(c);
-            velMesh.addVertex(p+vel*lineScale);
+			ofVec3f vc = vel;
+			vc.normalize();
+			float hue = (atan2(vc.y, vc.x)+3.14159265)/(3.14159265*2.0);
+			ofFloatColor c;
+			c.setHsb(hue, 1.0, 1.0);
+			c.a = 0.25;
+			velMesh.addColor(c);
+			velMesh.addVertex(p);
+			c.a = 0.0;
+			velMesh.addColor(c);
+			velMesh.addVertex(p+vel*lineScale);
 		}
 	}
-    ofPushStyle();
-    ofEnableAlphaBlending();
-    velMesh.draw();
-    ofPopStyle();
+
+	ofPushStyle();
+	ofEnableAlphaBlending();
+	velMesh.draw();
+	ofPopStyle();
 }
 
 ///////////////////////////////////////////
-//	CONFIG.
+//                CONFIG                 //
 ///////////////////////////////////////////
 
 void ofxOpticalFlowFarneback::setMirror(bool mirrorHorizontally, bool mirrorVertically) {
