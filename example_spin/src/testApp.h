@@ -7,8 +7,7 @@
 #define COLUMNS 10
 #define N_CELLS ROWS*COLUMNS
 
-class testApp : public ofBaseApp{
-
+class testApp : public ofBaseApp {
 	public:
 		void setup();
 		void update();
@@ -23,9 +22,9 @@ class testApp : public ofBaseApp{
 		void windowResized(int w, int h);
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
-		
-        ofVideoGrabber vidGrabber;
-        ofxOpticalFlowFarneback flowSolver;
-        float rotation[N_CELLS];
-        float rotationVelocity[N_CELLS];
+
+		ofVideoGrabber vidGrabber;
+		ofxOpticalFlowFarneback flowSolver;
+		float rotation[N_CELLS];
+		float rotationVelocity[N_CELLS];
 };
