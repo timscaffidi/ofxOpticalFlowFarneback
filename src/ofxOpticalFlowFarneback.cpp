@@ -97,23 +97,23 @@ void ofxOpticalFlowFarneback::destroy() {
 ///////////////////////////////////////////
 
 void ofxOpticalFlowFarneback::update(ofImage& source) {
-	update(source.getPixels(), source.width, source.height, source.type);
+    update(source.getPixels().getData(), source.getWidth(), source.getHeight(), source.getImageType());
 }
 
 void ofxOpticalFlowFarneback::update(ofxCvColorImage& source) {
-	update(source.getPixels(), source.width, source.height, OF_IMAGE_COLOR);
+    update(source.getPixels().getData(), source.width, source.height, OF_IMAGE_COLOR);
 }
 
 void ofxOpticalFlowFarneback::update(ofxCvGrayscaleImage& source) {
-	update(source.getPixels(), source.width, source.height, OF_IMAGE_GRAYSCALE);
+    update(source.getPixels().getData(), source.width, source.height, OF_IMAGE_GRAYSCALE);
 }
 
 void ofxOpticalFlowFarneback::update(ofVideoPlayer& source) {
-	update(source.getPixels(), source.width, source.height, OF_IMAGE_COLOR); // assume colour image type.
+    update(source.getPixels().getData(), source.getWidth(), source.getHeight(), OF_IMAGE_COLOR); // assume colour image type.
 }
 
 void ofxOpticalFlowFarneback::update(ofVideoGrabber& source) {
-	update(source.getPixels(), source.width, source.height, OF_IMAGE_COLOR); // assume colour image type.
+    update(source.getPixels().getData(), source.getWidth(), source.getHeight(), OF_IMAGE_COLOR); // assume colour image type.
 }
 
 void ofxOpticalFlowFarneback::update(unsigned char* pixels, int width, int height, int imageType) {
@@ -239,7 +239,7 @@ void ofxOpticalFlowFarneback::draw(int width, int height,  float lineScale, int 
 				continue;
 			}
 
-			ofLine(x, y, x + vel.x * lineScale, y + vel.y * lineScale);
+            ofDrawLine(x, y, x + vel.x * lineScale, y + vel.y * lineScale);
 		}
 	}
 }
